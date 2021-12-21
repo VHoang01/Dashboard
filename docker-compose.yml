@@ -18,17 +18,17 @@ services:
     container_name: database-dashboard
     ports:
       - "3306:3306"
-    command: --init-file /docker-entrypoint-initdb.d/bdd.sql
+    networks:
+      - backend
+    command: --init-file /docker-entrypoint-initdb.d/bdd.sql --default-authentication-plugin=mysql_native_password
     volumes:
       - ./mariadb/sql/bdd.sql:/docker-entrypoint-initdb.d/bdd.sql
       - db:/var/lib/mysql
     environment:
-      MARIADB_ROOT_PASSWORD: admin
-      MARIADB_DATABASE: mybb
-      MARIADB_USER: mybb
+      MARIADB_USER: admin
       MARIADB_PASSWORD: admin
-    networks:
-      - backend
+      MARIADB_DATABASE: dashboard
+      MARIADB_ROOT_PASSWORD: rootpassword
     restart: always
       
   backend:
