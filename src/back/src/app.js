@@ -1,13 +1,23 @@
 const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
-require('dotenv').config()
 const db = require('./services/db');
 
-db.getConnection().then((con) => {
-   con.query(`SELECT 1 + 1 as solution`).then((row) => {
-      console.log(row);
-   });
-});
+db.getConnection(con => {
+    console.log(con);
+}).catch(err => {
+    console.log(err);
+})
+
+
+// app.use(cors());
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
+
+// const AuthLoginRoute = require('./routes/auth/login');
+
+// app.use('/auth/login', AuthLoginRoute);
 
 app.listen(8080, () => {
     console.log("Server open at: http://localhost:8080");
