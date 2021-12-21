@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  frontend:
+    container_name: frontend-dashboard
+    build:
+      context: ./src/front
+      dockerfile: Dockerfile
+    volumes:
+      - './src/front:/front'
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+  database:
+    image: mariadb:10.7.1-focal
+    container_name: database-dashboard
+    ports:
+      - "3306:3306"
+    command: --init-file /docker-entrypoint-initdb.d/bdd.sql
+    volumes:
+      - ./mariadb/sql/bdd.sql:/docker-entrypoint-initdb.d/bdd.sql
+      - db:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: admin
+      MARIADB_DATABASE: mybb
+      MARIADB_USER: mybb
+      MARIADB_PASSWORD: admin
+    networks:
+      - backend
+    restart: always
+      
+  backend:
+    container_name: backend-dashboard
+    build:
+      context: ./src/back
+      dockerfile: Dockerfile
+    volumes:
+      - './src/back:/back'
+    networks:
+      - backend
+    ports:
+      - '8080:8080'
+    depends_on:
+      - database
+    
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  db:
