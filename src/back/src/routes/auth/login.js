@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 const {loginUser} = require('../../controllers/AuthControllers');
 
 router.post('/', (req, res) => {
@@ -9,9 +10,10 @@ router.post('/', (req, res) => {
     loginUser(username, password, (user) => {
         if (user === null)
             return res.status(400).json({success: false, message: "Invalid user credentials !"});
-
-        console.log(user);
-        // JWT
+        return res.status(200).json({
+            user: user,
+            auth: jwt.sign({username: username, id: user}, process.env.JWT_SECRET)
+        });
     });
 
 })
