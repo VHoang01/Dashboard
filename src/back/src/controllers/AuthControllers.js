@@ -8,7 +8,7 @@ const loginUser = (username, password, cb) => {
             if (rows[0].password === password)
                 return cb(rows[0].uuid);
             else
-                return cb(null);
+                cb(null);
         }).then(async () => {
             await con.end();
         });
