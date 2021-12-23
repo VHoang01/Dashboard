@@ -29,9 +29,11 @@ CREATE TABLE `users` (
   `uuid` varchar(255) NOT NULL DEFAULT uuid(),
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
+  `settings` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '[]' CHECK (json_valid(`settings`)),
+  `layout` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT '[]' CHECK (json_valid(`layout`)),
   PRIMARY KEY (`uuid`),
-  UNIQUE KEY `table_name_username_uindex` (`username`),
-  UNIQUE KEY `table_name_uuid_uindex` (`uuid`)
+  UNIQUE KEY `table_name_uuid_uindex` (`uuid`),
+  UNIQUE KEY `table_name_username_uindex` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

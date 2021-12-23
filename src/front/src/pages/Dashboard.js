@@ -67,7 +67,6 @@ class Dashboard extends React.Component {
 
     loadWidget() {
         axios.get('http://localhost:8080/widgets/', auth(this.auth)).then((response) => {
-            console.log(response.data);
             this.setState({settings: response.data.data});
         }).catch((err) => {
             console.log(err.response);
@@ -79,7 +78,6 @@ class Dashboard extends React.Component {
             return;
         return this.state.settings.map((settings, index) => {
             if (settings.widget === 'weather') {
-                console.log(settings);
                 return <WeatherWidget key={index} token={this.auth} settings={settings.data}/>
             }
             return (<div key={index}>Hello</div>)

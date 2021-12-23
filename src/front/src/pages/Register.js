@@ -28,9 +28,6 @@ export default class Register extends React.Component {
         })
     }
     onClickLogin() {
-        console.log(this.state.password);
-        console.log(this.state.username);
-
         axios.post('http://localhost:8080/auth/register', {
             username: this.state.username,
             password: this.state.password
