@@ -87,8 +87,9 @@ class Dashboard extends React.Component {
     }
 
     showWidget() {
-        if (this.state.settings === undefined)
+        if (this.state.settings === undefined || this.state.settings.length === 0)
             return;
+
         return this.state.settings.map((settings, index) => {
             if (settings.widget === 'weather')
                 return <WeatherWidget key={index} token={this.auth} settings={settings.data}/>
