@@ -4,6 +4,10 @@ import {Navigate} from "react-router-dom";
 import Button from "@mui/material/Button";
 import {Add, HouseRounded} from "@mui/icons-material";
 import {Box, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@mui/material";
+import WeatherWidgetsSettings from "../components/dialog/WeatherWidgetsSettings";
+import auth from '../axios';
+import axios from "axios";
+import WeatherWidget from "../components/widgets/WeatherWidget";
 
 class Dashboard extends React.Component {
 
@@ -13,12 +17,16 @@ class Dashboard extends React.Component {
             redirect: undefined,
             redirectUrl: undefined,
             showDialog: false,
+            showSettingsDialog: false,
+            settingsDialog: undefined,
+            settings: undefined,
         }
         const { cookies } = this.props;
         this.cookies = cookies;
         this.openDialog = this.openDialog.bind(this);
         this.onCloseDialog = this.onCloseDialog.bind(this);
         this.onAddWidget = this.onAddWidget.bind(this);
+        this.onCloseSettingsDialog = this.onCloseSettingsDialog.bind(this);
     }
 
     showTime() {
@@ -45,23 +53,65 @@ class Dashboard extends React.Component {
                 redirect: true,
                 redirectUrl: "/login"
             });
+        this.auth = auth;
+        this.loadWidget();
     }
 
     onAddWidget() {
+        this.setState({
+            showSettingsDialog: false,
+            showDialog: false,
+        });
+        this.loadWidget();
+    }
 
+    loadWidget() {
+        axios.get('http://localhost:8080/widgets/', auth(this.auth)).then((response) => {
+            console.log(response.data);
+            this.setState({settings: response.data.data});
+        }).catch((err) => {
+            console.log(err.response);
+        })
+    }
+
+    showWidget() {
+        if (this.state.settings === undefined)
+            return;
+        return this.state.settings.map((settings, index) => {
+            if (settings.widget === 'weather') {
+                console.log(settings);
+                return <WeatherWidget key={index} token={this.auth} settings={settings.data}/>
+            }
+            return (<div key={index}>Hello</div>)
+        })
+    }
+
+    showSettingsDialog() {
+        if (this.state.showSettingsDialog !== true)
+            return;
+        if (this.state.settingsDialog === 'weather') {
+            return <WeatherWidgetsSettings token={this.auth} onCreate={this.onAddWidget} onCloseSettings={this.onCloseSettingsDialog}/>;
+        }
+    }
+
+    onCloseSettingsDialog() {
+        this.setState({
+            showSettingsDialog: false,
+            settingsDialog: undefined,
+            showDialog: false
+        })
     }
 
     showDialog() {
         return (
             <Dialog onClose={this.onCloseDialog} open={this.state.showDialog}>
                 <DialogTitle>
-                        Widgets:
+                    Widgets:
                 </DialogTitle>
                 <DialogContent>
                     <Box>
-                        <h3>
-                            Get weather of a city <IconButton onAdd={this.onAddWidget}><Add/></IconButton>
-                        </h3>
+                        <h3>Get weather of a city <IconButton onClick={() => this.setState({showDialog: false, showSettingsDialog: true, settingsDialog: 'weather'})}><Add/></IconButton></h3>
+                        <h3>Get un autre truc jsp quoi <IconButton onClick={() => this.setState({})}><Add/></IconButton></h3>
                     </Box>
                 </DialogContent>
             </Dialog>)
@@ -86,7 +136,7 @@ class Dashboard extends React.Component {
                 {this.showUserButton()}
                 {this.showAddWidgetButton()}
                 <Grid>
-
+                    {this.showWidget()}
                 </Grid>
             </div>
         )
@@ -105,6 +155,7 @@ class Dashboard extends React.Component {
             <div>
                 {this.state.redirect !== undefined ? <Navigate to={this.state.redirectUrl}/> : this.showApp()}
                 {this.showDialog()}
+                {this.showSettingsDialog()}
             </div>
         );
     }
