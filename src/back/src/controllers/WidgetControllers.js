@@ -13,7 +13,8 @@ const updateUserWidgetsData = (userId, data, callback) => {
 const getUserWidgetsData = (userId, callback) => {
     db.getConnection().then((con) => {
         con.query(`SELECT settings FROM users WHERE uuid = '${userId}'`).then((rows) => {
-            console.log(rows[0]);
+            if (rows[0] === undefined)
+                return callback(null);
             callback(rows[0].settings);
         }).then(async () => {
             await con.end();

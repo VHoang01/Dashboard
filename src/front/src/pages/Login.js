@@ -3,7 +3,8 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import axios from "axios";
 import {withCookies} from "react-cookie";
-import {Navigate} from "react-router-dom";
+import {Link, Navigate} from "react-router-dom";
+import {Box, Container, Grid, Typography} from "@mui/material";
 
 class Login extends React.Component {
 
@@ -47,13 +48,54 @@ class Login extends React.Component {
     }
     render() {
         return (
-            <div>
+            <Container component="main" maxWidth="xs">
+                <Box
+                    sx={{
+                        marginTop: 8,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                    <Typography component="h1" variant="h5">
+                        Sign in
+                    </Typography>
+                    <Box component="form" noValidate sx={{ mt: 1 }}>
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Username"
+                            name="email"
+                            autoComplete="email"
+                            autoFocus
+                            onChange={this.onUsernameChange}
+                        />
+                        <TextField
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            onChange={this.onPasswordChange}
+                            id="password"
+                            autoComplete="current-password"
+                        />
+                        <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }} onClick={this.onClickLogin}>
+                            Sign In
+                        </Button>
+                        <Grid container>
+                            <Grid item>
+                                <Link to={"/register"}>
+                                    {"Don't have an account? Sign Up"}
+                                </Link>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
                 {this.state.redirect !== undefined ? <Navigate to={this.state.redirectUrl}/> : null}
-                <h1>Login</h1>
-                <TextField id="outlined-basic" label="username" variant="outlined" onChange={this.onUsernameChange}/>
-                <TextField id="filled-basic" label="password" variant="outlined" onChange={this.onPasswordChange}/>
-                <Button onClick={this.onClickLogin}>Login</Button>
-            </div>
+            </Container>
         );
     }
 }

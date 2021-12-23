@@ -8,4 +8,12 @@ const getWeatherByCity = (city, callback) => {
     });
 }
 
-module.exports = {getWeatherByCity};
+const getForecastByCity = (city, callback) => {
+    axios.get(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${process.env.OPENWEATHER_API_KEY}&units=metric`).then((response) => {
+        callback(200, response.data);
+    }).catch((err) => {
+        callback(400, err.response.data);
+    });
+}
+
+module.exports = {getWeatherByCity, getForecastByCity};

@@ -2,12 +2,18 @@ import React from 'react'
 import {withCookies} from "react-cookie";
 import {Navigate} from "react-router-dom";
 import Button from "@mui/material/Button";
-import {Add, HouseRounded} from "@mui/icons-material";
-import {Box, Dialog, DialogContent, DialogTitle, Grid, IconButton} from "@mui/material";
+import {Add, HouseRounded, Logout} from "@mui/icons-material";
+import {Box, Dialog, DialogContent, DialogTitle, Grid, IconButton, Typography} from "@mui/material";
 import WeatherWidgetsSettings from "../components/dialog/WeatherWidgetsSettings";
 import auth from '../axios';
 import axios from "axios";
 import WeatherWidget from "../components/widgets/WeatherWidget";
+import ForecastWidgetsSettings from "../components/dialog/ForecastWidgetsSettings";
+import ForecastWidget from "../components/widgets/ForecastWidget";
+import NewsPopularWidgetsSettings from "../components/dialog/NewsPopularWidgetsSettings";
+import MostPopularNewsWidget from "../components/widgets/MostPopularNews";
+import CovidWidgetsSettings from "../components/dialog/CovidWidgetsSettings";
+import CovidWidget from "../components/widgets/CovidWidget";
 
 class Dashboard extends React.Component {
 
@@ -27,12 +33,12 @@ class Dashboard extends React.Component {
         this.onCloseDialog = this.onCloseDialog.bind(this);
         this.onAddWidget = this.onAddWidget.bind(this);
         this.onCloseSettingsDialog = this.onCloseSettingsDialog.bind(this);
+        this.logout = this.logout.bind(this);
     }
 
     showTime() {
-        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        let today  = new Date();
-
+        let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit'};
+        let today = new Date();
         return (
             <div>
                 <h3>{today.toLocaleDateString("fr-FR", options)}</h3>
@@ -41,14 +47,21 @@ class Dashboard extends React.Component {
     }
 
     showAddWidgetButton() {
-        return (<Button variant="outlined" onClick={this.openDialog}>
-                <Add/>
-            </Button>)
+        return (
+            <Grid container justifyContent="flex-end">
+                <IconButton onClick={this.openDialog}>
+                    <Add/>
+                </IconButton>
+                <IconButton onClick={this.logout}>
+                    <Logout />
+                </IconButton>
+            </Grid>
+            )
     }
 
     componentDidMount() {
         let auth = this.cookies.get('auth');
-        if (auth === undefined || auth === null || auth.length === 0)
+        if (auth === undefined || auth === null || auth === 'null' || auth.length === 0)
             this.setState({
                 redirect: true,
                 redirectUrl: "/login"
@@ -77,9 +90,14 @@ class Dashboard extends React.Component {
         if (this.state.settings === undefined)
             return;
         return this.state.settings.map((settings, index) => {
-            if (settings.widget === 'weather') {
+            if (settings.widget === 'weather')
                 return <WeatherWidget key={index} token={this.auth} settings={settings.data}/>
-            }
+            if (settings.widget === 'forecast')
+                return <ForecastWidget key={index} token={this.auth} settings={settings.data}/>
+            if (settings.widget === 'newspopular')
+                return <MostPopularNewsWidget key={index} token={this.auth} settings={settings.data}/>
+            if (settings.widget === 'covid')
+                return <CovidWidget key={index} token={this.auth} settings={settings.data}/>
             return (<div key={index}>Hello</div>)
         })
     }
@@ -87,9 +105,14 @@ class Dashboard extends React.Component {
     showSettingsDialog() {
         if (this.state.showSettingsDialog !== true)
             return;
-        if (this.state.settingsDialog === 'weather') {
+        if (this.state.settingsDialog === 'weather')
             return <WeatherWidgetsSettings token={this.auth} onCreate={this.onAddWidget} onCloseSettings={this.onCloseSettingsDialog}/>;
-        }
+        if (this.state.settingsDialog === 'forecast')
+            return <ForecastWidgetsSettings token={this.auth} onCreate={this.onAddWidget} onCloseSettings={this.onCloseSettingsDialog}/>;
+        if (this.state.settingsDialog === 'newspopular')
+            return <NewsPopularWidgetsSettings token={this.auth} onCreate={this.onAddWidget} onCloseSettings={this.onCloseSettingsDialog}/>;
+        if (this.state.settingsDialog === 'covid')
+            return <CovidWidgetsSettings token={this.auth} onCreate={this.onAddWidget} onCloseSettings={this.onCloseSettingsDialog}/>;
     }
 
     onCloseSettingsDialog() {
@@ -109,7 +132,9 @@ class Dashboard extends React.Component {
                 <DialogContent>
                     <Box>
                         <h3>Get weather of a city <IconButton onClick={() => this.setState({showDialog: false, showSettingsDialog: true, settingsDialog: 'weather'})}><Add/></IconButton></h3>
-                        <h3>Get un autre truc jsp quoi <IconButton onClick={() => this.setState({})}><Add/></IconButton></h3>
+                        <h3>Get forecast of a city <IconButton onClick={() => this.setState({showDialog: false, showSettingsDialog: true, settingsDialog: 'forecast'})}><Add/></IconButton></h3>
+                        <h3>Get New York Times most popular news <IconButton onClick={() => this.setState({showDialog: false, showSettingsDialog: true, settingsDialog: 'newspopular'})}><Add/></IconButton></h3>
+                        <h3>Get Covid information by country <IconButton onClick={() => this.setState({showDialog: false, showSettingsDialog: true, settingsDialog: 'covid'})}><Add/></IconButton></h3>
                     </Box>
                 </DialogContent>
             </Dialog>)
@@ -130,22 +155,26 @@ class Dashboard extends React.Component {
     showApp() {
         return (
             <div>
-                {this.showTime()}
-                {this.showUserButton()}
+                <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <Typography variant={"h2"}>
+                        Dashboard
+                    </Typography>
+                    {this.showTime()}
+                </Box>
                 {this.showAddWidgetButton()}
-                <Grid>
+                <Grid container spacing={{ xs: 2, md: 5 }} columns={{ xs: 4, sm: 8, md: 12 }}>
                     {this.showWidget()}
                 </Grid>
             </div>
         )
     }
 
-    showUserButton() {
-        return (<div>
-            <IconButton>
-                <HouseRounded />
-            </IconButton>
-        </div>)
+    logout() {
+        this.cookies.set('auth', null, {path: '/'});
+        this.setState({
+            redirect: true,
+            redirectUrl: "/login"
+        })
     }
 
     render() {

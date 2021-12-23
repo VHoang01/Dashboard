@@ -3,7 +3,7 @@ import {Button, Dialog, DialogContent, DialogTitle, TextField} from "@mui/materi
 import auth from '../../axios';
 import axios from "axios";
 
-class WeatherWidgetsSettings extends React.Component {
+export default class ForecastWidgetsSettings extends React.Component {
 
     constructor(props) {
         super(props);
@@ -27,7 +27,7 @@ class WeatherWidgetsSettings extends React.Component {
 
     onClickCreate() {
         axios.post('http://localhost:8080/widgets/', {
-            widget: 'weather',
+            widget: 'forecast',
             data: {
                 city: this.state.city
             }
@@ -43,7 +43,7 @@ class WeatherWidgetsSettings extends React.Component {
         return (
             <Dialog onClose={this.onCloseDialog} open={true}>
                 <DialogTitle>
-                    Weather widgets:
+                    Forecast Widgets
                 </DialogTitle>
                 <DialogContent>
                     <TextField type={"text"} label={"city"} onChange={this.onChangeInput}/>
@@ -53,5 +53,3 @@ class WeatherWidgetsSettings extends React.Component {
         );
     }
 }
-
-export default WeatherWidgetsSettings;
